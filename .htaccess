@@ -1,0 +1,106 @@
+RewriteEngine On
+
+# Blog post rewrite rule: /blog/slug -> post.php?slug=slug
+RewriteRule ^blog/([^/]+)/?$ post.php?slug=$1 [L,QSA]
+
+# ==========================
+# Redirect index or index.php to domain root
+# ==========================
+# Redirect index or index.php to domain root of this app
+RewriteCond %{THE_REQUEST} /index(?:\.php)? [NC]
+RewriteRule ^index(?:\.php)?$ /hinduja/ [L,R=301]
+
+# Add a special case for Admin directory
+RewriteRule ^Admin/?$ Admin/Login.php [L]
+
+# ==============================
+# Redirect /Blog/slug to Post.php?slug=slug
+# (Fixing your blog URLs)
+# ==============================
+RewriteRule ^Blog/([^/]+)/?$ Post.php?slug=$1 [L,QSA]
+
+# Redirect /post/Tags.php to /Tags.php
+RewriteRule ^Blog/Tags\.php$ Tags.php [L,R=301]
+
+# ==============================
+# Handle Services with clean URLs
+# ==============================
+
+# Main services/specialities page
+RewriteRule ^services/?$ services.php [L]
+
+# Bank industry services
+RewriteRule ^service/([a-z0-9\-]+)/?$ $1.php [L,NC]
+    
+
+
+# Individual service/speciality pages
+RewriteRule ^services/departments/([^/]+)/?$ $1.php [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(trauma-and-emergency-care)/?$ services/$1 [R=301,L]
+RewriteRule ^(best-gynaecology-hospital-in-hosur)/?$ services/$1 [R=301,L]
+
+# ==============================
+# Handle Doctors with clean URLs
+# ==============================
+
+# Main doctors page
+RewriteRule ^team/?$ doctors.php [L]
+
+# Individual doctor pages
+RewriteRule ^team/([^/]+)/?$ $1.php [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(Dr-[A-Za-z0-9\-]+)/?$ team/$1 [R=301,L]
+#RewriteRule ^(Manpreet_Singh)/?$ team/$1 [R=301,L]
+
+# Disable MultiViews to avoid interference with rewrite rules
+Options -MultiViews
+
+# Disable automatic directory trailing slash for cleaner handling
+DirectorySlash Off
+
+# ==============================
+# Explicit rules for pages whose name clashes with a subdirectory
+# ==============================
+RewriteRule ^departments/obg/?$ departments/obg.php [L]
+RewriteRule ^departments/gastro-liver-treatment/?$ departments/gastro-liver-treatment.php [L]
+RewriteRule ^departments/neurosurgery/?$ departments/neurosurgery.php [L]
+RewriteRule ^departments/orthopaedics/?$ departments/orthopaedics.php [L]
+RewriteRule ^departments/general-surgery/?$ departments/general-surgery.php [L]
+RewriteRule ^departments/urology-treatment/?$ departments/urology-treatment.php [L]
+RewriteRule ^doctors/?$ doctors.php [L]
+
+# ==============================
+# Remove .php and .html extensions
+# ==============================
+
+# IMPORTANT: Exclude Admin directory from URL rewrites
+RewriteCond %{REQUEST_URI} !/Admin/ [NC]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}\.php -f [OR]
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.+?)/?$ $1.php [L]
+
+# Redirect URLs with .php to clean URLs (but not for Admin)
+RewriteCond %{ENV:REDIRECT_STATUS} ^$
+RewriteCond %{THE_REQUEST} \s/+([^?]*)\.php[\s?] [NC]
+RewriteCond %{REQUEST_URI} !/Admin/ [NC]
+RewriteRule ^ /%1 [L,R=301]
+
+# Remove .html extension (but not for Admin)
+RewriteCond %{REQUEST_URI} !/Admin/ [NC]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}\.html -f [OR]
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.+?)/?$ $1.html [L]
+
+# Redirect URLs with .html to clean URLs (but not for Admin)
+RewriteCond %{ENV:REDIRECT_STATUS} ^$
+RewriteCond %{THE_REQUEST} \s/+([^?]*)\.html[\s?] [NC]
+RewriteCond %{REQUEST_URI} !/Admin/ [NC]
+RewriteRule ^ /%1 [L,R=301]
+
