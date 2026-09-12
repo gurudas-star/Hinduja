@@ -1,25 +1,22 @@
 <?php
 
-session_start();
-// Database Variables
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Database Configuration
+// If on localhost / XAMPP, use local settings; otherwise use server settings if defined
 $Host = 'localhost';
 $DBUser = 'root';
 $DBPass = '';
 $DB = 'travel_bee';
 $Charset = 'utf8mb4';
 
-// $Host = '103.1.112.109';
+// IQH Live Server Database Settings (uncomment on live server if applicable)
+// $Host = 'localhost';
 // $DBUser = 'iqh_admin';
 // $DBPass = 'iqh@2026';
 // $DB = 'iqh_db';
-// $Charset = 'utf8mb4';
-
-//
-// $Host = '103.1.112.109';
-// $DBUser = 'iqh_anytime';
-// $DBPass = 'anytime@123';
-// $DB = 'anytime_db';
-// $Charset = 'utf8mb4';
 
 $dsn = "mysql:host=$Host;dbname=$DB;charset=$Charset";
 $options = [
@@ -30,8 +27,9 @@ $options = [
 
 try {
     $pdo = new PDO($dsn, $DBUser, $DBPass, $options);
-}
-catch (\PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+} catch (\PDOException $e) {
+    // Log error and allow page to load gracefully instead of crashing entire site
+    error_log("Database connection error: " . $e->getMessage());
+    $pdo = null;
 }
 ?>

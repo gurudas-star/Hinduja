@@ -12,7 +12,11 @@
     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicons/hinduja.png" />
     <link rel="manifest" href="assets/images/favicons/site.webmanifest" />
 
-    <base href="/hinduja/">
+    <?php
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+    $base_path = (strpos($requestUri, '/hinduja/') !== false) ? '/hinduja/' : '/';
+    ?>
+    <base href="<?php echo $base_path; ?>">
 
     <!-- fonts (Brand Guidelines: Headers = Open Sans, Paragraphs = Roboto) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
