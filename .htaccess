@@ -1,103 +1,55 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
+# Exclude existing physical files and directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Special case for Admin directory
+RewriteRule ^admin/?$ admin/login.php [L,NC]
+RewriteRule ^Admin/?$ admin/login.php [L,NC]
+
 # Blog post rewrite rule: /blog/slug -> post.php?slug=slug
-RewriteRule ^blog/([^/]+)/?$ post.php?slug=$1 [L,QSA]
-
-# ==========================
-# Redirect index or index.php to domain root
-# ==========================
-RewriteCond %{THE_REQUEST} /index(?:\.php)? [NC]
-RewriteRule ^index(?:\.php)?$ / [L,R=301]
-
-# Add a special case for Admin directory
-RewriteRule ^Admin/?$ Admin/Login.php [L]
-
-# ==============================
-# Redirect /Blog/slug to Post.php?slug=slug
-# ==============================
-RewriteRule ^Blog/([^/]+)/?$ Post.php?slug=$1 [L,QSA]
-
-# Redirect /post/Tags.php to /Tags.php
-RewriteRule ^Blog/Tags\.php$ Tags.php [L,R=301]
+RewriteRule ^blog/([^/]+)/?$ post.php?slug=$1 [L,QSA,NC]
 
 # ==============================
 # Handle Services with clean URLs
 # ==============================
-
-# Main services/specialities page
-RewriteRule ^services/?$ services.php [L]
-
-# Bank industry services
+RewriteRule ^services/?$ services.php [L,NC]
 RewriteRule ^service/([a-z0-9\-]+)/?$ $1.php [L,NC]
-
-# Individual service/speciality pages
-RewriteRule ^services/departments/([^/]+)/?$ $1.php [L]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(trauma-and-emergency-care)/?$ services/$1 [R=301,L]
-RewriteRule ^(best-gynaecology-hospital-in-hosur)/?$ services/$1 [R=301,L]
+RewriteRule ^services/departments/([^/]+)/?$ $1.php [L,NC]
 
 # ==============================
 # Handle Doctors with clean URLs
 # ==============================
-
-# Main doctors page
-RewriteRule ^team/?$ doctors.php [L]
-
-# Individual doctor pages
-RewriteRule ^team/([^/]+)/?$ $1.php [L]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(Dr-[A-Za-z0-9\-]+)/?$ team/$1 [R=301,L]
-#RewriteRule ^(Manpreet_Singh)/?$ team/$1 [R=301,L]
-
-# Disable MultiViews to avoid interference with rewrite rules
-Options -MultiViews
-
-# Disable automatic directory trailing slash for cleaner handling
-DirectorySlash Off
+RewriteRule ^team/?$ doctors.php [L,NC]
+RewriteRule ^doctors/?$ doctors.php [L,NC]
+RewriteRule ^team/([^/]+)/?$ $1.php [L,NC]
+RewriteRule ^Dr-([A-Za-z0-9\-]+)/?$ team/Dr-$1 [R=301,L,NC]
 
 # ==============================
-# Explicit rules for pages whose name clashes with a subdirectory
+# Explicit rules for department pages
 # ==============================
-RewriteRule ^departments/obg/?$ departments/obg.php [L]
-RewriteRule ^departments/gastro-liver-treatment/?$ departments/gastro-liver-treatment.php [L]
-RewriteRule ^departments/neurosurgery/?$ departments/neurosurgery.php [L]
-RewriteRule ^departments/orthopaedics/?$ departments/orthopaedics.php [L]
-RewriteRule ^departments/general-surgery/?$ departments/general-surgery.php [L]
-RewriteRule ^departments/urology-treatment/?$ departments/urology-treatment.php [L]
-RewriteRule ^doctors/?$ doctors.php [L]
+RewriteRule ^departments/obg/?$ departments/obg.php [L,NC]
+RewriteRule ^departments/gastro-liver-treatment/?$ departments/gastro-liver-treatment.php [L,NC]
+RewriteRule ^departments/neurosurgery/?$ departments/neurosurgery.php [L,NC]
+RewriteRule ^departments/orthopaedics/?$ departments/orthopaedics.php [L,NC]
+RewriteRule ^departments/general-surgery/?$ departments/general-surgery.php [L,NC]
+RewriteRule ^departments/urology-treatment/?$ departments/urology-treatment.php [L,NC]
+
+# Main pages
+RewriteRule ^specialties/?$ specialties.php [L,NC]
+RewriteRule ^gallery/?$ gallery.php [L,NC]
+RewriteRule ^contact/?$ contact.php [L,NC]
+RewriteRule ^about/?$ about.php [L,NC]
+RewriteRule ^appointment/?$ appointment.php [L,NC]
+RewriteRule ^faqs/?$ faqs.php [L,NC]
+RewriteRule ^timetable/?$ timetable.php [L,NC]
 
 # ==============================
-# Remove .php and .html extensions
+# Remove .php extension from URLs
 # ==============================
-
-# IMPORTANT: Exclude Admin directory from URL rewrites
-RewriteCond %{REQUEST_URI} !/Admin/ [NC]
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}\.php -f [OR]
-RewriteCond %{REQUEST_FILENAME}\.php -f
-RewriteRule ^(.+?)/?$ $1.php [L]
-
-# Redirect URLs with .php to clean URLs (but not for Admin)
-RewriteCond %{ENV:REDIRECT_STATUS} ^$
-RewriteCond %{THE_REQUEST} \s/+([^?]*)\.php[\s?] [NC]
-RewriteCond %{REQUEST_URI} !/Admin/ [NC]
-RewriteRule ^ /%1 [L,R=301]
-
-# Remove .html extension (but not for Admin)
-RewriteCond %{REQUEST_URI} !/Admin/ [NC]
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}\.html -f [OR]
-RewriteCond %{REQUEST_FILENAME}\.html -f
-RewriteRule ^(.+?)/?$ $1.html [L]
-
-# Redirect URLs with .html to clean URLs (but not for Admin)
-RewriteCond %{ENV:REDIRECT_STATUS} ^$
-RewriteCond %{THE_REQUEST} \s/+([^?]*)\.html[\s?] [NC]
-RewriteCond %{REQUEST_URI} !/Admin/ [NC]
-RewriteRule ^ /%1 [L,R=301]
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^([^/]+)/?$ $1.php [L,QSA]
 </IfModule>
